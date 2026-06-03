@@ -111,6 +111,8 @@ header.scrolled {
   box-shadow: 0 1px 0 rgba(255,255,255,0.06);
   padding: 12px 0;
 }
+/* header must be above mobile-nav so hamburger→X is always clickable */
+@media (max-width: 900px) { header { z-index: 1002; } }
 .header-inner { display: flex; align-items: center; gap: 32px; }
 .logo {
   font-family: var(--font-h); font-weight: 800; font-size: 1.5rem;
@@ -311,14 +313,7 @@ nav a:hover { color: #fff; background: var(--glass); }
 .stat-num { font-family: var(--font-h); font-size: 2rem; font-weight: 800; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 .stat-label { font-size: 0.8rem; color: var(--muted); margin-top: 4px; line-height: 1.4; }
 
-.scroll-hint {
-  position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%); z-index: 3;
-  display: flex; flex-direction: column; align-items: center; gap: 8px;
-  opacity: 0.4; animation: fadeUp 1s var(--ease2) 1.2s both;
-}
-.scroll-hint span { font-size: 0.75rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
-.scroll-arrow { width: 24px; height: 24px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); animation: bounceDown 1.5s ease-in-out infinite; }
-@keyframes bounceDown { 0%,100%{transform:rotate(45deg) translateY(0)} 50%{transform:rotate(45deg) translateY(6px)} }
+.scroll-hint { display: none; }
 
 /* ─── SECTION BASE ─── */
 section { padding: 100px 0; }
@@ -556,29 +551,50 @@ footer { padding: 32px 0; border-top: 1px solid var(--glass-b); background: var(
 .success-state h3 { font-family: var(--font-h); font-size: 1.5rem; font-weight: 800; margin-bottom: 8px; }
 .success-state p { color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
 
-/* ─── HERO BUTTON GLOW (thin version for header CTA) ─── */
+/* ─── BUTTON GLOW (thin orbiting white line) ─── */
 .btn-glow-thin {
   position: relative; display: inline-block; border-radius: 100px;
 }
 .btn-glow-thin::before {
   content: '';
-  position: absolute; inset: -2px;
-  border-radius: 100px;
+  position: absolute; inset: -2px; border-radius: 100px;
   background: conic-gradient(
     from var(--angle2, 0deg),
     transparent 0deg,
-    rgba(255,255,255,0.85) 50deg,
+    rgba(255,255,255,0.9) 50deg,
     rgba(255,255,255,0.2) 100deg,
     transparent 160deg,
     transparent 360deg
   );
   animation: rotateBorder2 2.5s linear infinite;
-  filter: blur(0.5px);
-  z-index: -1;
+  filter: blur(0.5px); z-index: -1;
 }
 @property --angle2 { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
 @keyframes rotateBorder2 { to { --angle2: 360deg; } }
-.btn-glow-thin .btn-primary { position: relative; z-index: 1; }
+.btn-glow-thin .btn-primary,
+.btn-glow-thin .btn-ghost { position: relative; z-index: 1; }
+
+/* Ghost button with glow */
+.btn-glow-ghost {
+  position: relative; display: inline-block; border-radius: 100px;
+}
+.btn-glow-ghost::before {
+  content: '';
+  position: absolute; inset: -2px; border-radius: 100px;
+  background: conic-gradient(
+    from var(--angle3, 0deg),
+    transparent 0deg,
+    rgba(255,255,255,0.6) 50deg,
+    rgba(255,255,255,0.15) 100deg,
+    transparent 160deg,
+    transparent 360deg
+  );
+  animation: rotateBorder3 3s linear infinite;
+  filter: blur(0.5px); z-index: -1;
+}
+@property --angle3 { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+@keyframes rotateBorder3 { to { --angle3: 360deg; } }
+.btn-glow-ghost .btn-ghost { position: relative; z-index: 1; }
 
 /* ─── RESPONSIVE ─── */
 @media (max-width: 900px) {
@@ -599,25 +615,31 @@ footer { padding: 32px 0; border-top: 1px solid var(--glass-b); background: var(
   /* Hero mobile */
   #hero { padding: 100px 0 60px; min-height: 100svh; }
   .hero-title { font-size: clamp(2.6rem, 14vw, 4rem); }
-  .hero-sub { font-size: 0.9rem; line-height: 1.7; }
+  .hero-sub { font-size: 0.88rem; line-height: 1.7; }
   .hero-badge { font-size: 0.75rem; padding: 6px 14px; margin-bottom: 20px; }
   .hero-cta { flex-direction: column; gap: 12px; width: 100%; }
-  .hero-cta .btn-primary, .hero-cta .btn-ghost { width: 100%; justify-content: center; padding: 15px 20px; }
+  .hero-cta .btn-glow-thin,
+  .hero-cta .btn-glow-ghost { width: 100%; }
+  .hero-cta .btn-primary,
+  .hero-cta .btn-ghost { width: 100%; justify-content: center; padding: 15px 20px; }
+  /* scroll hint hidden on mobile */
+  .scroll-hint { display: none; }
 
   /* Stats: 2x2 grid on mobile */
   .hero-stats {
     display: grid !important;
     grid-template-columns: 1fr 1fr;
-    gap: 1px; margin-top: 40px;
+    gap: 0; margin-top: 40px;
+    width: 100%; border-radius: 20px;
   }
-  .stat { padding: 16px 12px; }
-  .stat-num { font-size: 1.6rem; }
-  .stat-label { font-size: 0.72rem; }
+  .stat { padding: 18px 12px; }
+  .stat-num { font-size: 1.5rem; }
+  .stat-label { font-size: 0.7rem; }
   .stat + .stat::before { display: none; }
-  /* Horizontal dividers for 2x2 */
-  .stat:nth-child(1) { border-right: 1px solid var(--glass-b); border-bottom: 1px solid var(--glass-b); }
-  .stat:nth-child(2) { border-bottom: 1px solid var(--glass-b); }
-  .stat:nth-child(3) { border-right: 1px solid var(--glass-b); }
+  .stat:nth-child(1) { border-right: 1px solid var(--glass-b); border-bottom: 1px solid var(--glass-b); border-radius: 20px 0 0 0; }
+  .stat:nth-child(2) { border-bottom: 1px solid var(--glass-b); border-radius: 0 20px 0 0; }
+  .stat:nth-child(3) { border-right: 1px solid var(--glass-b); border-radius: 0 0 0 20px; }
+  .stat:nth-child(4) { border-radius: 0 0 20px 0; }
 
   .portfolio-grid { grid-template-columns: 1fr; }
   .why-grid { grid-template-columns: 1fr !important; }
@@ -699,7 +721,9 @@ footer { padding: 32px 0; border-top: 1px solid var(--glass-b); background: var(
         <div class="btn-glow-thin">
           <button class="btn-primary open-modal" data-ua="Замовити сайт →" data-en="Order Website →">Замовити сайт →</button>
         </div>
-        <a href="#portfolio" class="btn-ghost" data-ua="Переглянути роботи" data-en="View Portfolio">Переглянути роботи</a>
+        <div class="btn-glow-ghost">
+          <a href="#portfolio" class="btn-ghost" data-ua="Переглянути роботи" data-en="View Portfolio">Переглянути роботи</a>
+        </div>
       </div>
       <div class="hero-stats glass">
         <div class="stat">
@@ -963,10 +987,10 @@ footer { padding: 32px 0; border-top: 1px solid var(--glass-b); background: var(
         <div class="stars">★★★★★</div>
         <p class="testi-text" data-ua='"Вже за 3 дні мав готовий сайт для моєї кав'ярні. Заявки одразу йдуть у Telegram — дуже зручно. Результат перевершив очікування."' data-en='"In just 3 days I had a ready site for my café. Leads go directly to Telegram — very convenient. The result exceeded expectations."'>"Вже за 3 дні мав готовий сайт для моєї кав'ярні. Заявки одразу йдуть у Telegram — дуже зручно. Результат перевершив очікування."</p>
         <div class="testi-author">
-          <div class="testi-avatar" style="background:linear-gradient(135deg,#6366f1,#a855f7)">MK</div>
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#6366f1,#a855f7)">ОК</div>
           <div>
-            <div class="testi-name">Marek Kowalski</div>
-            <div class="testi-biz" data-ua="Кав'ярня «Kawa&Co», Краків" data-en="Café «Kawa&Co», Kraków">Кав'ярня «Kawa&Co», Краків</div>
+            <div class="testi-name">Олексій Коваленко</div>
+            <div class="testi-biz" data-ua="Кав'ярня «Горнятко», Варшава" data-en="Café «Horniatko», Warsaw">Кав'ярня «Горнятко», Варшава</div>
           </div>
         </div>
       </div>
@@ -974,21 +998,21 @@ footer { padding: 32px 0; border-top: 1px solid var(--glass-b); background: var(
         <div class="stars">★★★★★</div>
         <p class="testi-text" data-ua='"Домен, хостинг і SEO — все вже включено. Не потрібно нікуди доплачувати. Сайт виглядає на 5000 євро, а заплатила $250."' data-en='"Domain, hosting and SEO — all already included. No extra payments needed. The site looks like €5,000 and I paid $250."'>"Домен, хостинг і SEO — все вже включено. Не потрібно нікуди доплачувати. Сайт виглядає на 5000 євро, а заплатила $250."</p>
         <div class="testi-author">
-          <div class="testi-avatar" style="background:linear-gradient(135deg,#a855f7,#ec4899)">AS</div>
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#a855f7,#ec4899)">АК</div>
           <div>
-            <div class="testi-name">Anna Szymańska</div>
-            <div class="testi-biz" data-ua="Салон краси, Варшава" data-en="Beauty salon, Warsaw">Салон краси, Варшава</div>
+            <div class="testi-name">Анна Кравченко</div>
+            <div class="testi-biz" data-ua="Салон краси «Аура», Краків" data-en="Beauty salon «Aura», Kraków">Салон краси «Аура», Краків</div>
           </div>
         </div>
       </div>
       <div class="testi-card reveal reveal-delay-3">
         <div class="stars">★★★★★</div>
-        <p class="testi-text" data-ua='"Profesjonalna robota i błyskawiczna realizacja. Strona gotowa w 3 dni, od razu na Google. Polecam każdemu przedsiębiorcy."' data-en='"Professional work and lightning-fast delivery. Site ready in 3 days, immediately on Google. I recommend to every entrepreneur."'>"Profesjonalna robota i błyskawiczna realizacja. Strona gotowa w 3 dni, od razu na Google. Polecam każdemu przedsiębiorcy."</p>
+        <p class="testi-text" data-ua='"Професійна робота і блискавична реалізація. Сайт готовий за 3 дні, одразу з'явився в Google. Рекомендую кожному підприємцю."' data-en='"Professional work and lightning-fast delivery. Site ready in 3 days, immediately on Google. I recommend to every entrepreneur."'>"Професійна робота і блискавична реалізація. Сайт готовий за 3 дні, одразу з'явився в Google. Рекомендую кожному підприємцю."</p>
         <div class="testi-author">
-          <div class="testi-avatar" style="background:linear-gradient(135deg,#6366f1,#ec4899)">PW</div>
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#6366f1,#ec4899)">ПВ</div>
           <div>
-            <div class="testi-name">Piotr Wiśniewski</div>
-            <div class="testi-biz" data-ua="Авто-сервіс, Вроцлав" data-en="Auto service, Wrocław">Авто-сервіс, Вроцлав</div>
+            <div class="testi-name">Петро Вишневський</div>
+            <div class="testi-biz" data-ua="Авто-сервіс «Механік», Гдиня" data-en="Auto service «Mekhanik», Gdynia">Авто-сервіс «Механік», Гдиня</div>
           </div>
         </div>
       </div>
