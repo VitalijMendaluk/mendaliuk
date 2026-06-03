@@ -323,7 +323,9 @@ section { padding: 100px 0; }
 }
 #why .container { position: relative; z-index: 1; }
 
-.why-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-top: 56px; }
+.why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 56px; }
+@media (max-width: 900px) { .why-grid { grid-template-columns: repeat(2, 1fr) !important; } }
+@media (max-width: 540px) { .why-grid { grid-template-columns: 1fr !important; } }
 .why-card {
   padding: 30px 26px; border-radius: var(--r2);
   background: rgba(255,255,255,0.03); border: 1px solid var(--glass-b);
@@ -395,18 +397,60 @@ section { padding: 100px 0; }
 
 /* ─── CTA BANNER ─── */
 #cta-banner {
-  background: var(--bg2); padding: 100px 0;
+  background: var(--bg2); padding: 120px 0;
   position: relative; overflow: hidden;
 }
-#cta-banner::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 70% at 50% 50%, rgba(99,102,241,0.1), transparent); }
-#cta-banner::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: var(--grad); opacity: 0.4; }
-.cta-inner { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 32px; }
+#cta-canvas {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 0;
+}
+#cta-banner::before {
+  content: ''; position: absolute; inset: 0; z-index: 1;
+  background:
+    radial-gradient(ellipse 70% 80% at 50% 50%, rgba(99,102,241,0.18), transparent 70%),
+    radial-gradient(ellipse 40% 40% at 20% 80%, rgba(168,85,247,0.12), transparent 60%),
+    radial-gradient(ellipse 30% 30% at 80% 20%, rgba(236,72,153,0.08), transparent 60%);
+  animation: ctaPulse 6s ease-in-out infinite;
+}
+@keyframes ctaPulse { 0%,100%{opacity:0.8} 50%{opacity:1.2} }
+#cta-banner::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: var(--grad); opacity: 0.5; z-index: 2; }
+.cta-inner { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 32px; }
+
+/* Glowing orbit button */
+.btn-glow-wrap {
+  position: relative; display: inline-block; border-radius: 100px;
+  padding: 3px;
+}
+.btn-glow-wrap::before {
+  content: '';
+  position: absolute; inset: -3px;
+  border-radius: 100px;
+  background: conic-gradient(
+    from var(--angle, 0deg),
+    transparent 0deg,
+    rgba(255,255,255,0.9) 60deg,
+    rgba(255,255,255,0.3) 120deg,
+    transparent 180deg,
+    transparent 360deg
+  );
+  animation: rotateBorder 3s linear infinite;
+  filter: blur(1px);
+}
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+@keyframes rotateBorder { to { --angle: 360deg; } }
+.btn-glow-wrap .btn-primary {
+  position: relative; z-index: 1;
+}
 
 /* ─── CONTACTS ─── */
 #contacts { background: var(--bg); }
 .contacts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-top: 56px; align-items: start; }
-.contacts-info p { color: var(--muted); font-weight: 300; font-size: 0.95rem; line-height: 1.8; margin-bottom: 32px; }
-.contact-links { display: flex; flex-direction: column; gap: 16px; }
+.contacts-info p { color: var(--muted); font-weight: 300; font-size: 0.95rem; line-height: 1.8; margin-bottom: 28px; }
+.contact-links { display: flex; flex-direction: column; gap: 14px; }
 .contact-link {
   display: flex; align-items: center; gap: 16px;
   padding: 18px 22px; border-radius: var(--r2);
@@ -418,9 +462,30 @@ section { padding: 100px 0; }
 .contact-icon { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
 .contact-link-label { font-size: 0.8rem; color: var(--muted); margin-bottom: 2px; }
 .contact-link-val { font-weight: 500; font-size: 0.95rem; }
-.contacts-cta { padding: 40px; border-radius: var(--r2); background: var(--glass); border: 1px solid var(--glass-b); backdrop-filter: blur(20px); text-align: center; }
-.contacts-cta h3 { font-family: var(--font-h); font-size: 1.8rem; font-weight: 800; margin-bottom: 12px; }
-.contacts-cta p { color: var(--muted); font-weight: 300; margin-bottom: 28px; line-height: 1.6; font-size: 0.95rem; }
+
+/* Inline contact form (right column) */
+.contacts-form-box {
+  padding: 32px; border-radius: var(--r2);
+  background: var(--glass); border: 1px solid var(--glass-b);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+}
+.contacts-form-box h3 { font-family: var(--font-h); font-size: 1.4rem; font-weight: 800; margin-bottom: 6px; }
+.contacts-form-box p { color: var(--muted); font-weight: 300; margin-bottom: 22px; font-size: 0.9rem; line-height: 1.6; }
+.inline-form .form-group { margin-bottom: 12px; }
+.inline-form .form-group label { display: block; font-size: 0.8rem; font-weight: 500; color: rgba(255,255,255,0.55); margin-bottom: 7px; }
+.inline-form .form-group input {
+  width: 100%; padding: 13px 16px;
+  background: rgba(255,255,255,0.05); border: 1px solid var(--glass-b);
+  border-radius: 12px; color: #fff; font-family: var(--font-b); font-size: 0.92rem;
+  outline: none; transition: border-color 0.25s, box-shadow 0.25s;
+}
+.inline-form .form-group input::placeholder { color: var(--muted); }
+.inline-form .form-group input:focus { border-color: rgba(99,102,241,0.5); box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
+.inline-form-submit { width: 100%; margin-top: 6px; padding: 14px; font-size: 0.95rem; border-radius: 12px; justify-content: center; }
+.inline-success { display: none; text-align: center; padding: 24px 0; }
+.inline-success-icon { font-size: 2rem; margin-bottom: 12px; }
+.inline-success h4 { font-family: var(--font-h); font-size: 1.2rem; font-weight: 800; margin-bottom: 6px; }
+.inline-success p { color: var(--muted); font-size: 0.88rem; margin-bottom: 0; }
 
 /* ─── FOOTER ─── */
 footer { padding: 32px 0; border-top: 1px solid var(--glass-b); background: var(--bg); }
@@ -647,7 +712,7 @@ footer { padding: 32px 0; border-top: 1px solid var(--glass-b); background: var(
 
       <div class="portfolio-card reveal reveal-delay-1" data-url="https://dentalgdynia.vercel.app/">
         <div class="portfolio-img-wrap">
-          <img src="https://image.thum.io/get/width/800/crop/500/https://dentalgdynia.vercel.app/" alt="Dental Clinic Gdynia" loading="lazy">
+          <img src="https://s.wordpress.com/mshots/v1/https%3A%2F%2Fdentalgdynia.vercel.app%2F?w=800&h=500" alt="Dental Clinic Gdynia" loading="lazy">
           <div class="portfolio-overlay">
             <a class="overlay-btn" href="https://dentalgdynia.vercel.app/" target="_blank" rel="noopener">
               <span data-ua="Переглянути сайт" data-en="View website">Переглянути сайт</span> →
@@ -662,7 +727,7 @@ footer { padding: 32px 0; border-top: 1px solid var(--glass-b); background: var(
 
       <div class="portfolio-card reveal reveal-delay-2" data-url="https://poland-brown.vercel.app/">
         <div class="portfolio-img-wrap">
-          <img src="https://image.thum.io/get/width/800/crop/500/https://poland-brown.vercel.app/" alt="Poland Business" loading="lazy">
+          <img src="https://s.wordpress.com/mshots/v1/https%3A%2F%2Fpoland-brown.vercel.app%2F?w=800&h=500" alt="Poland Business" loading="lazy">
           <div class="portfolio-overlay">
             <a class="overlay-btn" href="https://poland-brown.vercel.app/" target="_blank" rel="noopener">
               <span data-ua="Переглянути сайт" data-en="View website">Переглянути сайт</span> →
@@ -677,7 +742,7 @@ footer { padding: 32px 0; border-top: 1px solid var(--glass-b); background: var(
 
       <div class="portfolio-card reveal reveal-delay-3" data-url="https://vmenndaliuk.vercel.app/">
         <div class="portfolio-img-wrap">
-          <img src="https://image.thum.io/get/width/800/crop/500/https://vmenndaliuk.vercel.app/" alt="Portfolio" loading="lazy">
+          <img src="https://s.wordpress.com/mshots/v1/https%3A%2F%2Fvmenndaliuk.vercel.app%2F?w=800&h=500" alt="Portfolio" loading="lazy">
           <div class="portfolio-overlay">
             <a class="overlay-btn" href="https://vmenndaliuk.vercel.app/" target="_blank" rel="noopener">
               <span data-ua="Переглянути сайт" data-en="View website">Переглянути сайт</span> →
@@ -692,7 +757,7 @@ footer { padding: 32px 0; border-top: 1px solid var(--glass-b); background: var(
 
       <div class="portfolio-card reveal reveal-delay-1" data-url="https://stomatolog-peach.vercel.app/">
         <div class="portfolio-img-wrap">
-          <img src="https://image.thum.io/get/width/800/crop/500/https://stomatolog-peach.vercel.app/" alt="Stomatolog" loading="lazy">
+          <img src="https://s.wordpress.com/mshots/v1/https%3A%2F%2Fstomatolog-peach.vercel.app%2F?w=800&h=500" alt="Stomatolog" loading="lazy">
           <div class="portfolio-overlay">
             <a class="overlay-btn" href="https://stomatolog-peach.vercel.app/" target="_blank" rel="noopener">
               <span data-ua="Переглянути сайт" data-en="View website">Переглянути сайт</span> →
@@ -707,7 +772,7 @@ footer { padding: 32px 0; border-top: 1px solid var(--glass-b); background: var(
 
       <div class="portfolio-card reveal reveal-delay-2" data-url="https://site-6ojo.vercel.app/">
         <div class="portfolio-img-wrap">
-          <img src="https://image.thum.io/get/width/800/crop/500/https://site-6ojo.vercel.app/" alt="Business site" loading="lazy">
+          <img src="https://s.wordpress.com/mshots/v1/https%3A%2F%2Fsite-6ojo.vercel.app%2F?w=800&h=500" alt="Business site" loading="lazy">
           <div class="portfolio-overlay">
             <a class="overlay-btn" href="https://site-6ojo.vercel.app/" target="_blank" rel="noopener">
               <span data-ua="Переглянути сайт" data-en="View website">Переглянути сайт</span> →
@@ -722,7 +787,7 @@ footer { padding: 32px 0; border-top: 1px solid var(--glass-b); background: var(
 
       <div class="portfolio-card reveal reveal-delay-3" data-url="https://clining-eight.vercel.app/">
         <div class="portfolio-img-wrap">
-          <img src="https://image.thum.io/get/width/800/crop/500/https://clining-eight.vercel.app/" alt="Cleaning service" loading="lazy">
+          <img src="https://s.wordpress.com/mshots/v1/https%3A%2F%2Fclining-eight.vercel.app%2F?w=800&h=500" alt="Cleaning service" loading="lazy">
           <div class="portfolio-overlay">
             <a class="overlay-btn" href="https://clining-eight.vercel.app/" target="_blank" rel="noopener">
               <span data-ua="Переглянути сайт" data-en="View website">Переглянути сайт</span> →
@@ -737,7 +802,7 @@ footer { padding: 32px 0; border-top: 1px solid var(--glass-b); background: var(
 
       <div class="portfolio-card reveal reveal-delay-1" data-url="https://deteiling.vercel.app/">
         <div class="portfolio-img-wrap">
-          <img src="https://image.thum.io/get/width/800/crop/500/https://deteiling.vercel.app/" alt="Auto detailing" loading="lazy">
+          <img src="https://s.wordpress.com/mshots/v1/https%3A%2F%2Fdeteiling.vercel.app%2F?w=800&h=500" alt="Auto detailing" loading="lazy">
           <div class="portfolio-overlay">
             <a class="overlay-btn" href="https://deteiling.vercel.app/" target="_blank" rel="noopener">
               <span data-ua="Переглянути сайт" data-en="View website">Переглянути сайт</span> →
@@ -840,6 +905,7 @@ footer { padding: 32px 0; border-top: 1px solid var(--glass-b); background: var(
 
 <!-- CTA BANNER -->
 <section id="cta-banner">
+  <canvas id="cta-canvas"></canvas>
   <div class="container">
     <div class="cta-inner reveal">
       <div class="section-label" data-ua="Готові почати?" data-en="Ready to start?">Готові почати?</div>
@@ -848,7 +914,9 @@ footer { padding: 32px 0; border-top: 1px solid var(--glass-b); background: var(
         <span class="grad-text" data-ua="вже за 3 дні" data-en="in just 3 days">вже за 3 дні</span>
       </h2>
       <p style="color:var(--muted);text-align:center;max-width:480px;font-weight:300;line-height:1.7" data-ua="Не відкладайте — кожен день без сайту коштує вам потенційних клієнтів. Напишіть зараз і вже в четвер маєте готовий сайт." data-en="Don't delay — every day without a site costs you potential clients. Write now and in 3 days you have a live website.">Не відкладайте — кожен день без сайту коштує вам потенційних клієнтів. Напишіть зараз і вже в четвер маєте готовий сайт.</p>
-      <button class="btn-primary open-modal" style="padding:18px 40px;font-size:1.05rem" data-ua="Замовити сайт за $250 →" data-en="Order website for $250 →">Замовити сайт за $250 →</button>
+      <div class="btn-glow-wrap">
+        <button class="btn-primary open-modal" style="padding:18px 40px;font-size:1.05rem" data-ua="Замовити сайт за $250 →" data-en="Order website for $250 →">Замовити сайт за $250 →</button>
+      </div>
     </div>
   </div>
 </section>
@@ -862,8 +930,8 @@ footer { padding: 32px 0; border-top: 1px solid var(--glass-b); background: var(
     </div>
     <div class="contacts-grid">
       <div class="reveal">
-        <p data-ua="Напишіть у Telegram або Instagram — відповідаю зазвичай протягом кількох годин. Готовий обговорити ваш проєкт безкоштовно." data-en="Write on Telegram or Instagram — I usually reply within a few hours. Happy to discuss your project for free.">Напишіть у Telegram або Instagram — відповідаю зазвичай протягом кількох годин. Готовий обговорити ваш проєкт безкоштовно.</p>
-        <div class="contact-links" style="margin-top:0">
+        <p style="margin-bottom:28px" data-ua="Напишіть у Telegram або Instagram — відповідаю зазвичай протягом кількох годин. Готовий обговорити ваш проєкт безкоштовно." data-en="Write on Telegram or Instagram — I usually reply within a few hours. Happy to discuss your project for free.">Напишіть у Telegram або Instagram — відповідаю зазвичай протягом кількох годин. Готовий обговорити ваш проєкт безкоштовно.</p>
+        <div class="contact-links">
           <a href="tel:+48735184537" class="contact-link">
             <div class="contact-icon" style="background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.2)">📞</div>
             <div>
@@ -887,10 +955,33 @@ footer { padding: 32px 0; border-top: 1px solid var(--glass-b); background: var(
           </a>
         </div>
       </div>
-      <div class="contacts-cta glass reveal reveal-delay-2">
+
+      <!-- Inline contact form -->
+      <div class="contacts-form-box reveal reveal-delay-2">
         <h3><span class="grad-text" data-ua="Залишити заявку" data-en="Leave a request">Залишити заявку</span></h3>
-        <p data-ua="Заповніть форму — і я зв'яжусь з вами сьогодні для обговорення деталей." data-en="Fill the form — I'll contact you today to discuss the details.">Заповніть форму — і я зв'яжусь з вами сьогодні для обговорення деталей.</p>
-        <button class="btn-primary open-modal" style="width:100%;justify-content:center;padding:16px" data-ua="Замовити сайт →" data-en="Order Website →">Замовити сайт →</button>
+        <p data-ua="Заповніть форму — і я зв'яжусь з вами сьогодні." data-en="Fill the form — I'll contact you today.">Заповніть форму — і я зв'яжусь з вами сьогодні.</p>
+        <div id="inlineFormState">
+          <form class="inline-form" id="inlineContactForm" novalidate>
+            <div class="form-group">
+              <label><span data-ua="Ваше ім'я" data-en="Your name">Ваше ім'я</span></label>
+              <input type="text" id="ifname" placeholder="Іван / Ivan" required autocomplete="given-name">
+            </div>
+            <div class="form-group">
+              <label><span data-ua="Телефон" data-en="Phone">Телефон</span></label>
+              <input type="tel" id="ifphone" placeholder="+48 000 000 000" required autocomplete="tel">
+            </div>
+            <div class="form-group">
+              <label>Telegram <span style="color:var(--muted);font-size:0.75rem" data-ua="(необов'язково)" data-en="(optional)">(необов'язково)</span></label>
+              <input type="text" id="iftg" placeholder="@username">
+            </div>
+            <button type="submit" class="btn-primary inline-form-submit" data-ua="Надіслати →" data-en="Send →">Надіслати →</button>
+          </form>
+        </div>
+        <div class="inline-success" id="inlineSuccess">
+          <div class="inline-success-icon">✓</div>
+          <h4 data-ua="Дякую!" data-en="Thank you!">Дякую!</h4>
+          <p data-ua="Зв'яжусь з вами найближчим часом в Telegram." data-en="I'll contact you shortly on Telegram.">Зв'яжусь з вами найближчим часом в Telegram.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -1139,6 +1230,70 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
     if (t) { e.preventDefault(); t.scrollIntoView({behavior:'smooth', block:'start'}); }
   });
 });
+
+/* ── INLINE FORM ── */
+document.getElementById('inlineContactForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  if (!document.getElementById('ifname').value.trim() || !document.getElementById('ifphone').value.trim()) return;
+  document.getElementById('inlineFormState').style.display = 'none';
+  document.getElementById('inlineSuccess').style.display = 'block';
+});
+
+/* ── CTA CANVAS — floating rings ── */
+(function() {
+  const canvas = document.getElementById('cta-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, t = 0, rings = [];
+
+  function resize() {
+    W = canvas.width  = canvas.offsetWidth;
+    H = canvas.height = canvas.offsetHeight;
+  }
+
+  class Ring {
+    constructor() { this.reset(); }
+    reset() {
+      this.x = W * 0.5 + (Math.random() - 0.5) * W * 0.6;
+      this.y = H * 0.5 + (Math.random() - 0.5) * H * 0.6;
+      this.r = Math.random() * 60 + 20;
+      this.maxR = this.r + Math.random() * 120 + 60;
+      this.alpha = Math.random() * 0.3 + 0.1;
+      this.speed = Math.random() * 0.4 + 0.15;
+      this.color = Math.random() > 0.5 ? '99,102,241' : '168,85,247';
+    }
+    update() {
+      this.r += this.speed;
+      this.alpha -= 0.0015;
+      if (this.r > this.maxR || this.alpha <= 0) this.reset();
+    }
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(${this.color},${Math.max(0, this.alpha)})`;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+  }
+
+  function init() {
+    resize();
+    rings = Array.from({length: 14}, () => {
+      const ring = new Ring();
+      ring.r = Math.random() * ring.maxR; // stagger start
+      return ring;
+    });
+  }
+
+  function loop() {
+    ctx.clearRect(0, 0, W, H);
+    rings.forEach(r => { r.update(); r.draw(); });
+    requestAnimationFrame(loop);
+  }
+
+  window.addEventListener('resize', resize);
+  init(); loop();
+})();
 
 /* ── 3D TILT ── */
 document.querySelectorAll('.why-card, .testi-card').forEach(card => {
