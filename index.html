@@ -133,18 +133,37 @@ nav a:hover { color: #fff; background: var(--glass); }
   background: transparent; border: none; color: var(--muted); cursor: pointer; transition: all 0.25s;
 }
 .lang-btn.active { background: var(--grad); color: #fff; border-radius: 100px; }
-.hamburger { display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 8px; }
-.hamburger span { display: block; width: 22px; height: 2px; background: var(--white); border-radius: 2px; transition: all 0.3s; }
+.hamburger {
+  display: none; flex-direction: column; justify-content: center; gap: 5px;
+  background: none; border: none; cursor: pointer; padding: 8px;
+  width: 40px; height: 40px; position: relative; z-index: 1002;
+}
+.hamburger span {
+  display: block; width: 22px; height: 2px; background: var(--white);
+  border-radius: 2px; transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+  transform-origin: center;
+}
+.hamburger.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.active span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.hamburger.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
 .mobile-nav {
-  display: none; position: fixed; inset: 0; z-index: 999;
-  background: rgba(7,7,13,0.97); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-  flex-direction: column; align-items: center; justify-content: center; gap: 24px;
-  opacity: 0; pointer-events: none; transition: opacity 0.3s;
+  display: none; position: fixed; inset: 0; z-index: 1001;
+  background: rgba(7,7,13,0.98); backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  flex-direction: column; align-items: center; justify-content: center; gap: 20px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.35s cubic-bezier(0.25,0.46,0.45,0.94);
 }
 .mobile-nav.open { opacity: 1; pointer-events: all; }
-.mobile-nav a { font-family: var(--font-h); font-size: 2rem; font-weight: 700; color: #fff; text-decoration: none; transition: color 0.2s; }
-.mobile-nav a:hover { color: var(--indigo); }
-.mobile-nav-close { position: absolute; top: 20px; right: 24px; background: none; border: none; color: var(--muted); font-size: 2rem; cursor: pointer; }
+.mobile-nav a {
+  font-family: var(--font-h); font-size: clamp(1.6rem, 8vw, 2.2rem); font-weight: 700;
+  color: rgba(255,255,255,0.85); text-decoration: none; transition: color 0.2s;
+  letter-spacing: -0.01em;
+}
+.mobile-nav a:hover { color: #fff; }
+.mobile-nav-divider { width: 40px; height: 1px; background: var(--glass-b); margin: 4px 0; }
+.mobile-nav-close { display: none; } /* X handled by hamburger toggle now */
 
 /* ─── HERO ─── */
 #hero {
@@ -537,6 +556,30 @@ footer { padding: 32px 0; border-top: 1px solid var(--glass-b); background: var(
 .success-state h3 { font-family: var(--font-h); font-size: 1.5rem; font-weight: 800; margin-bottom: 8px; }
 .success-state p { color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
 
+/* ─── HERO BUTTON GLOW (thin version for header CTA) ─── */
+.btn-glow-thin {
+  position: relative; display: inline-block; border-radius: 100px;
+}
+.btn-glow-thin::before {
+  content: '';
+  position: absolute; inset: -2px;
+  border-radius: 100px;
+  background: conic-gradient(
+    from var(--angle2, 0deg),
+    transparent 0deg,
+    rgba(255,255,255,0.85) 50deg,
+    rgba(255,255,255,0.2) 100deg,
+    transparent 160deg,
+    transparent 360deg
+  );
+  animation: rotateBorder2 2.5s linear infinite;
+  filter: blur(0.5px);
+  z-index: -1;
+}
+@property --angle2 { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+@keyframes rotateBorder2 { to { --angle2: 360deg; } }
+.btn-glow-thin .btn-primary { position: relative; z-index: 1; }
+
 /* ─── RESPONSIVE ─── */
 @media (max-width: 900px) {
   nav { display: none; }
@@ -548,15 +591,44 @@ footer { padding: 32px 0; border-top: 1px solid var(--glass-b); background: var(
   .step-num { margin: 0; flex-shrink: 0; }
   .contacts-grid { grid-template-columns: 1fr; gap: 40px; }
 }
+
+/* ─── MOBILE OVERRIDES ─── */
 @media (max-width: 640px) {
-  section { padding: 72px 0; }
-  .hero-stats { flex-direction: column; gap: 0; }
-  .stat + .stat::before { left: 20%; top: 0; height: 1px; width: 60%; }
+  section { padding: 64px 0; }
+
+  /* Hero mobile */
+  #hero { padding: 100px 0 60px; min-height: 100svh; }
+  .hero-title { font-size: clamp(2.6rem, 14vw, 4rem); }
+  .hero-sub { font-size: 0.9rem; line-height: 1.7; }
+  .hero-badge { font-size: 0.75rem; padding: 6px 14px; margin-bottom: 20px; }
+  .hero-cta { flex-direction: column; gap: 12px; width: 100%; }
+  .hero-cta .btn-primary, .hero-cta .btn-ghost { width: 100%; justify-content: center; padding: 15px 20px; }
+
+  /* Stats: 2x2 grid on mobile */
+  .hero-stats {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px; margin-top: 40px;
+  }
+  .stat { padding: 16px 12px; }
+  .stat-num { font-size: 1.6rem; }
+  .stat-label { font-size: 0.72rem; }
+  .stat + .stat::before { display: none; }
+  /* Horizontal dividers for 2x2 */
+  .stat:nth-child(1) { border-right: 1px solid var(--glass-b); border-bottom: 1px solid var(--glass-b); }
+  .stat:nth-child(2) { border-bottom: 1px solid var(--glass-b); }
+  .stat:nth-child(3) { border-right: 1px solid var(--glass-b); }
+
   .portfolio-grid { grid-template-columns: 1fr; }
-  .why-grid { grid-template-columns: 1fr; }
+  .why-grid { grid-template-columns: 1fr !important; }
   .testi-grid { grid-template-columns: 1fr; }
   .header-actions .btn-primary { display: none; }
   .footer-inner { flex-direction: column; text-align: center; }
+
+  /* CTA banner mobile */
+  #cta-banner { padding: 80px 0; }
+  .btn-glow-wrap { width: 100%; }
+  .btn-glow-wrap .btn-primary { width: 100%; justify-content: center; }
 }
 </style>
 </head>
@@ -588,12 +660,16 @@ footer { padding: 32px 0; border-top: 1px solid var(--glass-b); background: var(
 
 <!-- Mobile Nav -->
 <div class="mobile-nav" id="mobileNav">
-  <button class="mobile-nav-close" id="mobileNavClose">×</button>
   <a href="#portfolio" class="mobile-nav-link" data-ua="Портфоліо" data-en="Portfolio">Портфоліо</a>
-  <a href="#why" class="mobile-nav-link" data-ua="Про мене" data-en="Про мене">Про мене</a>
+  <a href="#why" class="mobile-nav-link" data-ua="Про мене" data-en="About">Про мене</a>
   <a href="#process" class="mobile-nav-link" data-ua="Процес" data-en="Process">Процес</a>
   <a href="#contacts" class="mobile-nav-link" data-ua="Контакти" data-en="Contacts">Контакти</a>
-  <button class="btn-primary open-modal" style="margin-top:16px" data-ua="Замовити сайт" data-en="Order Website">Замовити сайт</button>
+  <div class="mobile-nav-divider"></div>
+  <button class="btn-primary open-modal" style="margin-top:8px;padding:14px 36px" data-ua="Замовити сайт" data-en="Order Website">Замовити сайт</button>
+  <div style="display:flex;gap:20px;margin-top:8px">
+    <a href="https://t.me/Vmendaliuk" target="_blank" style="color:var(--muted);font-size:0.85rem;text-decoration:none">Telegram</a>
+    <a href="https://instagram.com/Vmendaliuk" target="_blank" style="color:var(--muted);font-size:0.85rem;text-decoration:none">Instagram</a>
+  </div>
 </div>
 
 <!-- HERO -->
@@ -620,7 +696,9 @@ footer { padding: 32px 0; border-top: 1px solid var(--glass-b); background: var(
         <span data-ua="SEO · Мобільна версія · Домен і хостинг включені · Термін 3 дні" data-en="SEO · Mobile-ready · Domain & hosting included · 3 days delivery">SEO · Мобільна версія · Домен і хостинг включені · Термін 3 дні</span>
       </p>
       <div class="hero-cta">
-        <button class="btn-primary open-modal" data-ua="Замовити сайт →" data-en="Order Website →">Замовити сайт →</button>
+        <div class="btn-glow-thin">
+          <button class="btn-primary open-modal" data-ua="Замовити сайт →" data-en="Order Website →">Замовити сайт →</button>
+        </div>
         <a href="#portfolio" class="btn-ghost" data-ua="Переглянути роботи" data-en="View Portfolio">Переглянути роботи</a>
       </div>
       <div class="hero-stats glass">
@@ -735,8 +813,8 @@ footer { padding: 32px 0; border-top: 1px solid var(--glass-b); background: var(
           </div>
         </div>
         <div class="card-info">
-          <h3 data-ua="Бізнес-сайт Польща" data-en="Business Site Poland">Бізнес-сайт Польща</h3>
-          <span class="card-tag" data-ua="Корпоративний сайт" data-en="Corporate website">Корпоративний сайт</span>
+          <h3 data-ua="Мовна школа" data-en="Language School">Мовна школа</h3>
+          <span class="card-tag" data-ua="Освіта" data-en="Education">Освіта</span>
         </div>
       </div>
 
@@ -750,8 +828,8 @@ footer { padding: 32px 0; border-top: 1px solid var(--glass-b); background: var(
           </div>
         </div>
         <div class="card-info">
-          <h3 data-ua="Портфоліо розробника" data-en="Developer Portfolio">Портфоліо розробника</h3>
-          <span class="card-tag" data-ua="Портфоліо" data-en="Portfolio">Портфоліо</span>
+          <h3 data-ua="Лазерна епіляція LoveEpil" data-en="Laser Epilation LoveEpil">Лазерна епіляція LoveEpil</h3>
+          <span class="card-tag" data-ua="Краса та здоров'я" data-en="Beauty & health">Краса та здоров'я</span>
         </div>
       </div>
 
@@ -780,8 +858,8 @@ footer { padding: 32px 0; border-top: 1px solid var(--glass-b); background: var(
           </div>
         </div>
         <div class="card-info">
-          <h3 data-ua="Бізнес-лендінг" data-en="Business Landing">Бізнес-лендінг</h3>
-          <span class="card-tag" data-ua="Landing page" data-en="Landing page">Landing page</span>
+          <h3 data-ua="Барбершоп Brutal Cut" data-en="Barbershop Brutal Cut">Барбершоп Brutal Cut</h3>
+          <span class="card-tag" data-ua="Барбершоп" data-en="Barbershop">Барбершоп</span>
         </div>
       </div>
 
@@ -811,6 +889,21 @@ footer { padding: 32px 0; border-top: 1px solid var(--glass-b); background: var(
         </div>
         <div class="card-info">
           <h3 data-ua="Авто-детейлінг" data-en="Auto Detailing">Авто-детейлінг</h3>
+          <span class="card-tag" data-ua="Авто-сервіс" data-en="Auto service">Авто-сервіс</span>
+        </div>
+      </div>
+
+      <div class="portfolio-card reveal reveal-delay-2" data-url="https://sto-omega-nine.vercel.app/">
+        <div class="portfolio-img-wrap">
+          <img src="https://s.wordpress.com/mshots/v1/https%3A%2F%2Fsto-omega-nine.vercel.app%2F?w=800&h=500" alt="СТО" loading="lazy">
+          <div class="portfolio-overlay">
+            <a class="overlay-btn" href="https://sto-omega-nine.vercel.app/" target="_blank" rel="noopener">
+              <span data-ua="Переглянути сайт" data-en="View website">Переглянути сайт</span> →
+            </a>
+          </div>
+        </div>
+        <div class="card-info">
+          <h3 data-ua="Автосервіс СТО" data-en="Auto Service STO">Автосервіс СТО</h3>
           <span class="card-tag" data-ua="Авто-сервіс" data-en="Auto service">Авто-сервіс</span>
         </div>
       </div>
@@ -1153,6 +1246,20 @@ footer { padding: 32px 0; border-top: 1px solid var(--glass-b); background: var(
   draw();
 })();
 
+/* ── TELEGRAM BOT ── */
+const TG_TOKEN   = '8090010233:AAGucMxosOir1f7ttPIUODULMbO2DYoqTHU';
+const TG_CHAT_ID = '-4934715371';
+async function sendToTelegram(name, phone, tg) {
+  const text = `🆕 Нова заявка з сайту!\n\n👤 Ім'я: ${name}\n📞 Телефон: ${phone}${tg ? '\n✈️ Telegram: ' + tg : ''}`;
+  try {
+    await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({chat_id: TG_CHAT_ID, text, parse_mode: 'HTML'})
+    });
+  } catch(e) { console.warn('Telegram send error', e); }
+}
+
 /* ── LANGUAGE ── */
 let currentLang = 'ua';
 function setLang(lang) {
@@ -1172,15 +1279,28 @@ const header = document.getElementById('header');
 window.addEventListener('scroll', () => header.classList.toggle('scrolled', window.scrollY > 40), {passive:true});
 
 /* ── MOBILE NAV ── */
-const mobileNav   = document.getElementById('mobileNav');
-const hamburger   = document.getElementById('hamburger');
-const mobileClose = document.getElementById('mobileNavClose');
-hamburger.addEventListener('click', () => mobileNav.classList.add('open'));
-mobileClose.addEventListener('click', () => mobileNav.classList.remove('open'));
-document.querySelectorAll('.mobile-nav-link').forEach(a => a.addEventListener('click', () => mobileNav.classList.remove('open')));
+const mobileNav = document.getElementById('mobileNav');
+const hamburger = document.getElementById('hamburger');
+
+function openMobileNav() {
+  mobileNav.classList.add('open');
+  hamburger.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+function closeMobileNav() {
+  mobileNav.classList.remove('open');
+  hamburger.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+hamburger.addEventListener('click', () => {
+  mobileNav.classList.contains('open') ? closeMobileNav() : openMobileNav();
+});
+document.querySelectorAll('.mobile-nav-link').forEach(a => a.addEventListener('click', closeMobileNav));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMobileNav(); });
 
 /* ── MODAL ── */
-const overlay    = document.getElementById('modalOverlay');
+const overlay   = document.getElementById('modalOverlay');
 const modalClose = document.getElementById('modalClose');
 const formState  = document.getElementById('formState');
 const successSt  = document.getElementById('successState');
@@ -1199,9 +1319,13 @@ modalClose.addEventListener('click', closeModal);
 overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-document.getElementById('contactForm').addEventListener('submit', function(e) {
+document.getElementById('contactForm').addEventListener('submit', async function(e) {
   e.preventDefault();
-  if (!document.getElementById('fname').value.trim() || !document.getElementById('fphone').value.trim()) return;
+  const name  = document.getElementById('fname').value.trim();
+  const phone = document.getElementById('fphone').value.trim();
+  const tg    = document.getElementById('ftg').value.trim();
+  if (!name || !phone) return;
+  await sendToTelegram(name, phone, tg);
   formState.style.display = 'none';
   successSt.style.display = 'block';
 });
@@ -1232,9 +1356,13 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 });
 
 /* ── INLINE FORM ── */
-document.getElementById('inlineContactForm').addEventListener('submit', function(e) {
+document.getElementById('inlineContactForm').addEventListener('submit', async function(e) {
   e.preventDefault();
-  if (!document.getElementById('ifname').value.trim() || !document.getElementById('ifphone').value.trim()) return;
+  const name  = document.getElementById('ifname').value.trim();
+  const phone = document.getElementById('ifphone').value.trim();
+  const tg    = document.getElementById('iftg').value.trim();
+  if (!name || !phone) return;
+  await sendToTelegram(name, phone, tg);
   document.getElementById('inlineFormState').style.display = 'none';
   document.getElementById('inlineSuccess').style.display = 'block';
 });
